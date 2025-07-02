@@ -48,15 +48,15 @@ static inline void rgba8_opacity_opaque(rgba8_t *dst, const rgba8_t *src);
 
 static inline void rgba8_opacity_source_alpha(rgba8_t *dst, const rgba8_t *src);
 
-static inline void rgba8_opacity_target_alpha(rgba8_t *dst, const rgba8_t *src);
+static inline void rgba8_opacity_destination_alpha(rgba8_t *dst, const rgba8_t *src);
 
 static inline void rgba8_opacity_transparent(rgba8_t *dst, const rgba8_t *src);
 
 static inline void rgba8_opacity_blend_source(rgba8_t *dst, const rgba8_t *src);
 
-static inline void rgba8_opacity_blend_target(rgba8_t *dst, const rgba8_t *src);
+static inline void rgba8_opacity_blend_destination(rgba8_t *dst, const rgba8_t *src);
 
-static inline void rgba8_opacity_blend_target(rgba8_t *dst, const rgba8_t *src);
+static inline void rgba8_opacity_blend_destination(rgba8_t *dst, const rgba8_t *src);
 
 static inline void rgba8_opacity_blend(rgba8_t *dst, const rgba8_t *src);
 
@@ -123,7 +123,7 @@ static inline void rgba8_opacity_blend(rgba8_t *dst, const rgba8_t *src);
 
 static inline void rgba8_opacity_opaque(rgba8_t *dst, const rgba8_t *src)
 {
-    /* 'target.RGBA = source.RGBA' */
+    /* 'destination.RGBA = source.RGBA' */
     *dst = *src;
 
     return;
@@ -131,15 +131,15 @@ static inline void rgba8_opacity_opaque(rgba8_t *dst, const rgba8_t *src)
 
 static inline void rgba8_opacity_source_alpha(rgba8_t *dst, const rgba8_t *src)
 {
-    /* 'target.RGB = source.RGB * source.Alpha' */
+    /* 'destination.RGB = source.RGB * source.Alpha' */
     RGB_MUL_ALPHA_OP(dst, src, src);
 
     return;
 }
 
-static inline void rgba8_opacity_target_alpha(rgba8_t *dst, const rgba8_t *src)
+static inline void rgba8_opacity_destination_alpha(rgba8_t *dst, const rgba8_t *src)
 {
-    /* 'target.RGB = source.RGB * target.Alpha' */
+    /* 'destination.RGB = source.RGB * destination.Alpha' */
     RGB_MUL_ALPHA_OP(dst, src, dst);
 
     return;
@@ -147,7 +147,7 @@ static inline void rgba8_opacity_target_alpha(rgba8_t *dst, const rgba8_t *src)
 
 static inline void rgba8_opacity_transparent(rgba8_t *dst, const rgba8_t *src)
 {
-    /* 'target.RGBA = target.RGBA + source.RGBA' */
+    /* 'destination.RGBA = destination.RGBA + source.RGBA' */
     RGBA_ADD_OP(dst, src);
 
     return;
@@ -155,7 +155,7 @@ static inline void rgba8_opacity_transparent(rgba8_t *dst, const rgba8_t *src)
 
 static inline void rgba8_opacity_blend_source(rgba8_t *dst, const rgba8_t *src)
 {
-    /* 'target.RGBA = target.RGBA * source.Alpha + source.RGBA' */
+    /* 'destination.RGBA = destination.RGBA * source.Alpha + source.RGBA' */
 
     RGBA_MUL_ALPHA_OP(dst, dst, src);
     RGBA_ADD_OP(dst, src);
@@ -163,9 +163,9 @@ static inline void rgba8_opacity_blend_source(rgba8_t *dst, const rgba8_t *src)
     return;
 }
 
-static inline void rgba8_opacity_blend_target(rgba8_t *dst, const rgba8_t *src)
+static inline void rgba8_opacity_blend_destination(rgba8_t *dst, const rgba8_t *src)
 {
-    /* 'target.RGBA = target.RGBA + source.RGBA * target.Alpha' */
+    /* 'destination.RGBA = destination.RGBA + source.RGBA * destination.Alpha' */
     rgba8_t src_tmp = *src;
     RGBA_MUL_ALPHA_OP(&src_tmp, &src_tmp, dst);
     RGBA_ADD_OP(dst, &src_tmp);
@@ -175,7 +175,7 @@ static inline void rgba8_opacity_blend_target(rgba8_t *dst, const rgba8_t *src)
 
 static inline void rgba8_opacity_blend(rgba8_t *dst, const rgba8_t *src)
 {
-    /* 'target.RGBA = target.RGBA * source.Alpha + source.RGBA * target.Alpha' */
+    /* 'destination.RGBA = destination.RGBA * source.Alpha + source.RGBA * destination.Alpha' */
     rgba8_t src_tmp = *src;
     RGBA_MUL_ALPHA_OP(&src_tmp, &src_tmp, dst);
     RGBA_MUL_ALPHA_OP(dst, dst, src);
@@ -226,12 +226,12 @@ int main()
     printf("var_updated_new = %x\n", var_updated_new);
 
     var_updated_new = 0x0;
-    printf("Target Alpha:\n");
+    printf("destination Alpha:\n");
     printf("var_src = %x\n", var_src);
     printf("var_dst = %x\n", var_dst);
     printf("var_updated_new = %x\n", var_updated_new);
     var_updated_new = var_dst;
-    rgba8_opacity_target_alpha(&var_updated_new, &var_src);
+    rgba8_opacity_destination_alpha(&var_updated_new, &var_src);
     printf("var_updated_new = %x\n", var_updated_new);
 
     var_updated_new = 0x0;
@@ -253,12 +253,12 @@ int main()
     printf("var_updated_new = %x\n", var_updated_new);
 
     var_updated_new = 0x0;
-    printf("Blend Target:\n");
+    printf("Blend destination:\n");
     printf("var_src = %x\n", var_src);
     printf("var_dst = %x\n", var_dst);
     printf("var_updated_new = %x\n", var_updated_new);
     var_updated_new = var_dst;
-    rgba8_opacity_blend_target(&var_updated_new, &var_src);
+    rgba8_opacity_blend_destination(&var_updated_new, &var_src);
     printf("var_updated_new = %x\n", var_updated_new);
 
     var_updated_new = 0x0;
